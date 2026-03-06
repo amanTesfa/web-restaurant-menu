@@ -1,49 +1,156 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Toaster, toast } from "react-hot-toast";
-import DataGrid, { Column, SearchPanel, Editing } from "devextreme-react/data-grid";
+import DataGrid, {
+  Column,
+  SearchPanel,
+  Editing,
+} from "devextreme-react/data-grid";
 import { HeaderFilter } from "devextreme-react/data-grid";
 import ReportViewer, {
+  Callbacks,
   RequestOptions,
 } from "devexpress-reporting-react/dx-report-viewer";
 import "devextreme/dist/css/dx.light.css";
 import "@devexpress/analytics-core/dist/css/dx-analytics.common.css";
 import "@devexpress/analytics-core/dist/css/dx-analytics.light.css";
 import "devexpress-reporting/dist/css/dx-webdocumentviewer.css";
+import { view } from "devexpress-reporting/scopes/reporting-chart-internal-series";
 function App() {
   const [showViewer, setShowViewer] = React.useState(false);
   const [selectedMenuType, setSelectedMenuType] = React.useState(1);
-
   // **product table state**
   const [products, setProducts] = React.useState<
-    { id: number; name: string; description: string; category:string; price: number }[]
+    {
+      id: number;
+      name: string;
+      description: string;
+      category: string;
+      price: number;
+    }[]
   >(() => {
     // realistic restaurant items
     return [
-      { id: 1, name: "Double cheese Burger", category: "Main Courses", description: "Beef, onion, cheese, egg", price: 400 },
-      { id: 2, name: "Doro Wat", category: "Main Courses", description: "Chicken, Onion, Ginger, Garlic, Butter, Spices, Injera", price: 700 },
-      { id: 3, name: "Veggie Soup", category: "Appetizers", description: "Tomato, bell pepper, onion, cheese", price: 150 },
-      { id: 4, name: "Chicken Shawarma", category: "Main Courses", description: "Chicken, tahini, vegetables, pita", price: 1500 },
-      { id: 5, name: "Caesar Salad", category: "Appetizers", description: "Lettuce, croutons, parmesan, dressing", price: 200 },
-      { id: 6, name: "Beef Steak", category: "Main Courses", description: "Beef, salt, pepper, garlic", price: 2500 },
-      { id: 7, name: "Margherita Pizza", category: "Main Courses", description: "Tomato sauce, mozzarella, basil", price: 550 },
-      { id: 8, name: "Chicken Nuggets", category: "Main Courses", description: "Chicken, bread crumbs, spices", price: 600 },
-      { id: 9, name: "Pineapple Juice", category: "Beverages", description: "Fresh pineapple, sugar, water", price: 118 },
-      { id: 10, name: "Fish and Chips", category: "Main Courses", description: "Fish, potatoes, batter, tartar sauce", price: 200 },
-      { id: 11, name: "Sambusa", category: "Appetizers", description: "Lentil, onion, spices", price: 50 },
-      { id: 12, name: "Greek Salad", category: "Appetizers", description: "Tomato, cucumber, olives, feta", price: 1200 },
-      { id: 13, name: "Mango Smoothie", category: "Beverages", description: "Mango, yogurt, milk, honey", price: 200 },
-      { id: 14, name: "Spaghetti Bolognese", category: "Main Courses", description: "Beef, tomato, pasta, herbs", price: 350 },
-      { id: 15, name: "Cappuccino", category: "Beverages", description: "Espresso, steamed milk, foam", price: 150 },
-      { id: 16, name: "Lazanya", category: "Main Courses", description: "Layered pasta, meat sauce, ricotta", price: 900 },
-      { id: 17, name: "Tiramisu", category: "Desserts", description: "Ladyfingers, mascarpone, coffee, cocoa", price: 1100 },
-      { id: 18, name: "Chocolate Cake", category: "Desserts", description: "Cocoa, flour, sugar, eggs", price: 256 },
-      { id: 19, name: "Fruit Salad", category: "Desserts", description: "Mixed fruits, honey, mint", price: 500 },
-      { id: 20, name: "Latte Coffee", category: "Beverages", description: "Espresso, steamed milk, foam", price: 300 },
+      {
+        id: 1,
+        name: "Double cheese Burger",
+        category: "Main Courses",
+        description: "Beef, onion, cheese, egg",
+        price: 400,
+      },
+      {
+        id: 2,
+        name: "Doro Wat",
+        category: "Main Courses",
+        description: "Chicken, Onion, Ginger, Garlic, Butter, Spices, Injera",
+        price: 700,
+      },
+      {
+        id: 3,
+        name: "Veggie Soup",
+        category: "Appetizers",
+        description: "Tomato, bell pepper, onion, cheese",
+        price: 150,
+      },
+      {
+        id: 4,
+        name: "Chicken Shawarma",
+        category: "Main Courses",
+        description: "Chicken, tahini, vegetables, pita",
+        price: 1500,
+      },
+      {
+        id: 6,
+        name: "Beef Steak",
+        category: "Main Courses",
+        description: "Beef, salt, pepper, garlic",
+        price: 2500,
+      },
+      {
+        id: 7,
+        name: "Margherita Pizza",
+        category: "Main Courses",
+        description: "Tomato sauce, mozzarella, basil",
+        price: 550,
+      },
+      {
+        id: 8,
+        name: "Chicken Nuggets",
+        category: "Main Courses",
+        description: "Chicken, bread crumbs, spices",
+        price: 600,
+      },
+      {
+        id: 9,
+        name: "Pineapple Juice",
+        category: "Beverages",
+        description: "Fresh pineapple, sugar, water",
+        price: 118,
+      },
+      {
+        id: 11,
+        name: "Sambusa",
+        category: "Appetizers",
+        description: "Lentil, onion, spices",
+        price: 50,
+      },
+      {
+        id: 12,
+        name: "Greek Salad",
+        category: "Main Courses",
+        description: "Tomato, cucumber, olives, feta",
+        price: 1200,
+      },
+      {
+        id: 13,
+        name: "Mango Smoothie",
+        category: "Beverages",
+        description: "Mango, yogurt, milk, honey",
+        price: 200,
+      },
+      {
+        id: 14,
+        name: "Spaghetti Bolognese",
+        category: "Main Courses",
+        description: "Beef, tomato, pasta, herbs",
+        price: 350,
+      },
+      {
+        id: 15,
+        name: "Cappuccino",
+        category: "Beverages",
+        description: "Espresso, steamed milk, foam",
+        price: 150,
+      },
+      {
+        id: 17,
+        name: "Tiramisu",
+        category: "Desserts",
+        description: "Ladyfingers, mascarpone, coffee, cocoa",
+        price: 1100,
+      },
+      {
+        id: 18,
+        name: "Chocolate Cake",
+        category: "Desserts",
+        description: "Cocoa, flour, sugar, eggs",
+        price: 256,
+      },
     ];
   });
+  React.useEffect(() => {
+    (async () => {
+      await fetch("http://localhost:52938/api/report/StoreReport", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(products),
+      });
+    })();
+  }, [products]);
   const [searchTerm, setSearchTerm] = React.useState("");
   const [sortConfig, setSortConfig] = React.useState<{
-    key: keyof typeof products[number];
+    key: keyof (typeof products)[number];
     direction: "asc" | "desc";
   } | null>(null);
 
@@ -54,7 +161,6 @@ function App() {
     setSelectedMenuType(menuType);
     setShowViewer(true);
   };
-
 
   // helper to add toast messages
   const addToast = (msg: string) => {
@@ -68,7 +174,7 @@ function App() {
       items = items.filter(
         (p) =>
           p.name.toLowerCase().includes(term) ||
-          p.description.toLowerCase().includes(term)
+          p.description.toLowerCase().includes(term),
       );
     }
     if (sortConfig !== null) {
@@ -83,9 +189,7 @@ function App() {
     return items;
   }, [products, searchTerm, sortConfig]);
 
-  const requestSort = (
-    key: keyof typeof products[number]
-  ) => {
+  const requestSort = (key: keyof (typeof products)[number]) => {
     let direction: "asc" | "desc" = "asc";
     if (
       sortConfig &&
@@ -99,13 +203,11 @@ function App() {
 
   const updateProduct = (
     id: number,
-    field: keyof typeof products[number],
-    value: string | number
+    field: keyof (typeof products)[number],
+    value: string | number,
   ) => {
     setProducts((prev) =>
-      prev.map((p) =>
-        p.id === id ? { ...p, [field]: value } : p
-      )
+      prev.map((p) => (p.id === id ? { ...p, [field]: value } : p)),
     );
     toast.success(`Product ${id} updated`);
   };
@@ -163,27 +265,45 @@ function App() {
         </button>
       </div>
       <div className="w-full max-w-4xl mt-10 bg-white rounded-lg shadow-lg p-6">
-        <h2 className="text-2xl font-bold mb-4 text-orange-600 ">Product List</h2>
+        {showViewer && (
+          <ReportViewer reportUrl={getReportUrl(selectedMenuType)}>
+            <RequestOptions
+              host="http://localhost:52938/"
+              invokeAction="DXXRDV"
+            />
+          </ReportViewer>
+        )}
+        <h2 className="text-2xl font-bold mb-4 text-orange-600 ">
+          Product List
+        </h2>
         <DataGrid
           dataSource={products}
           keyExpr="id"
           showBorders={true}
-          onRowUpdated={e => {
+          onRowUpdated={(e) => {
             const { id, name, description, price, category } = e.data;
-            updateProduct(id, 'name', name);
-            updateProduct(id, 'description', description);
-            updateProduct(id, 'price', price);
-            updateProduct(id, 'category', category);
+            updateProduct(id, "name", name);
+            updateProduct(id, "description", description);
+            updateProduct(id, "price", price);
+            updateProduct(id, "category", category);
           }}
         >
-          <SearchPanel width={300} visible={true} highlightCaseSensitive={false} />
+          <SearchPanel
+            width={300}
+            visible={true}
+            highlightCaseSensitive={false}
+          />
           <HeaderFilter visible={true} />
           <Editing
             mode="popup"
             allowUpdating={true}
             useIcons={true}
-            
-            popup={{ title: 'Edit Product', showTitle: true, width: 700, height: 500 }}
+            popup={{
+              title: "Edit Product",
+              showTitle: true,
+              width: 700,
+              height: 500,
+            }}
           />
           <Column dataField="id" caption="SN" width={60} allowEditing={false} />
           <Column dataField="name" caption="Name" />
@@ -209,7 +329,9 @@ function App() {
               <input
                 className="border px-3 py-2 w-full rounded"
                 value={editProduct.name}
-                onChange={e => setEditProduct({ ...editProduct, name: e.target.value })}
+                onChange={(e) =>
+                  setEditProduct({ ...editProduct, name: e.target.value })
+                }
               />
             </div>
             <div className="mb-4">
@@ -217,7 +339,12 @@ function App() {
               <input
                 className="border px-3 py-2 w-full rounded"
                 value={editProduct.description}
-                onChange={e => setEditProduct({ ...editProduct, description: e.target.value })}
+                onChange={(e) =>
+                  setEditProduct({
+                    ...editProduct,
+                    description: e.target.value,
+                  })
+                }
               />
             </div>
             <div className="mb-4">
@@ -226,15 +353,24 @@ function App() {
                 type="number"
                 className="border px-3 py-2 w-full rounded"
                 value={editProduct.price}
-                onChange={e => setEditProduct({ ...editProduct, price: Number(e.target.value) })}
+                onChange={(e) =>
+                  setEditProduct({
+                    ...editProduct,
+                    price: Number(e.target.value),
+                  })
+                }
               />
             </div>
             <button
               className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-800"
               onClick={() => {
-                updateProduct(editProduct.id, 'name', editProduct.name);
-                updateProduct(editProduct.id, 'description', editProduct.description);
-                updateProduct(editProduct.id, 'price', editProduct.price);
+                updateProduct(editProduct.id, "name", editProduct.name);
+                updateProduct(
+                  editProduct.id,
+                  "description",
+                  editProduct.description,
+                );
+                updateProduct(editProduct.id, "price", editProduct.price);
                 setModalOpen(false);
                 setEditProduct(null);
               }}
@@ -245,11 +381,6 @@ function App() {
         </div>
       )}
       <Toaster position="top-right" />
-      {showViewer && (
-        <ReportViewer reportUrl={getReportUrl(selectedMenuType)}>
-          <RequestOptions host="http://localhost:5000/" invokeAction="DXXRDV" />
-        </ReportViewer>
-      )}
     </div>
   );
 }
