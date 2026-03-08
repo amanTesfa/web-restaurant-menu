@@ -27,6 +27,7 @@ function App() {
       description: string;
       category: string;
       price: number;
+        url: string;
     }[]
   >(() => {
     // realistic restaurant items
@@ -296,6 +297,7 @@ function App() {
           <Column dataField="category" caption="Category" />
           <Column dataField="description" caption="Description" />
           <Column dataField="price" caption="Price" dataType="number" />
+                  <Column dataField="url" caption="Image" />
         </DataGrid>
       </div>
 
@@ -370,6 +372,22 @@ function App() {
                 }
               />
             </div>
+
+              <div className="mb-4">
+                <label className="block mb-1 font-semibold">Image URL</label>
+                <input
+                  className="border px-3 py-2 w-full rounded"
+                  value={editProduct.url || ""}
+                  onChange={(e) =>
+                    setEditProduct({ ...editProduct, url: e.target.value })
+                  }
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block mb-1 font-semibold">Upload Image</label>
+                <input type="file" className="border px-3 py-2 w-full rounded" disabled />
+                <span className="text-xs text-gray-500">(Sample only, not functional)</span>
+              </div>
             <button
               className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-800"
               onClick={() => {
@@ -380,6 +398,7 @@ function App() {
                   editProduct.description,
                 );
                 updateProduct(editProduct.id, "price", editProduct.price);
+                  updateProduct(editProduct.id, "url", editProduct.url);
                 toast.success(`Product updated successfully`);
                 setModalOpen(false);
                 setEditProduct(null);
