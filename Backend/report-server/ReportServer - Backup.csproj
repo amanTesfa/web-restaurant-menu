@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- DevExpress packages are commercial — install matching versions you have access to -->
+    <PackageReference Include="DevExpress.AspNetCore.Reporting" Version="25.2.5" />
+    <PackageReference Include="DevExpress.XtraReports" Version="25.2.5" />
+  </ItemGroup>
+</Project>
