@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React from "react";
 import { Toaster, toast } from "react-hot-toast";
 import DataGrid, {
   Column,
@@ -10,14 +10,12 @@ import DataGrid, {
 } from "devextreme-react/data-grid";
 import { HeaderFilter } from "devextreme-react/data-grid";
 import ReportViewer, {
-  Callbacks,
   RequestOptions,
 } from "devexpress-reporting-react/dx-report-viewer";
 import "devextreme/dist/css/dx.light.css";
 import "@devexpress/analytics-core/dist/css/dx-analytics.common.css";
 import "@devexpress/analytics-core/dist/css/dx-analytics.light.css";
 import "devexpress-reporting/dist/css/dx-webdocumentviewer.css";
-import { view } from "devexpress-reporting/scopes/reporting-chart-internal-series";
 function App() {
   const [showViewer, setShowViewer] = React.useState(false);
   const [selectedMenuType, setSelectedMenuType] = React.useState(1);
@@ -172,7 +170,7 @@ function App() {
   });
   React.useEffect(() => {
     (async () => {
-      await fetch("http://localhost:52938/api/report/StoreReport", {
+      await fetch("http://localhost:5000/api/report/StoreReport", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -181,11 +179,6 @@ function App() {
       });
     })();
   }, [products]);
-  const [searchTerm, setSearchTerm] = React.useState("");
-  const [sortConfig, setSortConfig] = React.useState<{
-    key: keyof (typeof products)[number];
-    direction: "asc" | "desc";
-  } | null>(null);
 
   const [modalOpen, setModalOpen] = React.useState(false);
   const [editProduct, setEditProduct] = React.useState<any>(null);
@@ -193,45 +186,6 @@ function App() {
   const downloadPdf = async (menuType: number) => {
     setSelectedMenuType(menuType);
     setShowViewer(true);
-  };
-
-  // helper to add toast messages
-  const addToast = (msg: string) => {
-    toast.success(msg);
-  };
-
-  const sortedFiltered = React.useMemo(() => {
-    let items = products;
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      items = items.filter(
-        (p) =>
-          p.name.toLowerCase().includes(term) ||
-          p.description.toLowerCase().includes(term),
-      );
-    }
-    if (sortConfig !== null) {
-      items = [...items].sort((a, b) => {
-        const aVal = a[sortConfig.key];
-        const bVal = b[sortConfig.key];
-        if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
-        if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
-        return 0;
-      });
-    }
-    return items;
-  }, [products, searchTerm, sortConfig]);
-
-  const requestSort = (key: keyof (typeof products)[number]) => {
-    let direction: "asc" | "desc" = "asc";
-    if (
-      sortConfig &&
-      sortConfig.key === key &&
-      sortConfig.direction === "asc"
-    ) {
-      direction = "desc";
-    }
-    setSortConfig({ key, direction });
   };
 
   const updateProduct = (
@@ -360,7 +314,7 @@ function App() {
               height="100%"
             >
               <RequestOptions
-                host="http://localhost:52938/"
+                host="http://localhost:5000/"
                 invokeAction="DXXRDV"
               />
             </ReportViewer>

@@ -1,4 +1,11 @@
 {
+  "scripts": {
+    "build": "cd Backend/report-server && dotnet build ReportServer.csproj && cd ../../web-restaurant-menu && npm run build",
+    "start": "concurrently \"cd Backend/report-server && dotnet run --project ReportServer.csproj\" \"cd web-restaurant-menu && npm run dev\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
   "dependencies": {
     "devexpress-reporting-react": "^25.2.5"
   }
